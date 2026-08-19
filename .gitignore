@@ -1,0 +1,11 @@
+.gradle/
+build/
+dist/
+local.properties
+.idea/
+*.iml
+.DS_Store
+
+# Staged in by tools/serve-and-collect.py, and whatever the phones send back.
+tools/serve/*.apk
+tools/serve/results/

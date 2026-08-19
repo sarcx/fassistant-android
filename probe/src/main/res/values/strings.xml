@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="probe_name">Fassistant probe</string>
+    <string name="probe_intro">Fills in the capability matrix for this phone. Type a package that is running right now, then run the checks.</string>
+    <string name="probe_target_hint">Package to test against</string>
+    <string name="probe_run">Run the checks</string>
+    <string name="probe_copy">Copy results</string>
+    <string name="probe_copied">Results copied.</string>
+    <string name="probe_grants_heading">\nThese two checks need a permission. Grant them here, then run the checks again.</string>
+    <string name="probe_grant_usage">Grant usage access</string>
+    <string name="probe_grant_overlay">Grant draw over other apps</string>
+    <string name="probe_open_target">Open the target app\'s settings</string>
+    <string name="probe_force_stop_hint">\nTo test the stopped bit: open the target app\'s settings, tap Force stop, then run the checks again. If the bit flips to true, we can tell a force-stop from a memory kill.\n</string>
+    <string name="probe_no_screen">This phone has no screen for that.</string>
+</resources>

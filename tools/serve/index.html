@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fassistant downloads</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --line: rgba(128, 128, 128, .38);
+    --accent: #9a5406;
+  }
+  @media (prefers-color-scheme: dark) { :root { --accent: #eea63a; } }
+
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, system-ui, sans-serif;
+    margin: 0 auto; padding: 24px 20px 56px;
+    line-height: 1.6; max-width: 34rem;
+  }
+  h1 { font-size: 1.45rem; margin: 0 0 4px; letter-spacing: -.02em; }
+  p.sub { margin: 0 0 8px; opacity: .7; font-size: .95rem; }
+
+  h2 {
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .11em;
+    opacity: .6; margin: 32px 0 10px; font-weight: 600;
+  }
+
+  a.dl {
+    display: block; padding: 14px 16px; margin-bottom: 10px;
+    border: 1px solid var(--line); border-radius: 10px;
+    text-decoration: none; color: inherit;
+  }
+  a.dl b { display: block; font-size: 1.05rem; }
+  a.dl span { font-size: .87rem; opacity: .7; }
+  a.dl .n {
+    display: inline-block; min-width: 1.4em; margin-right: .3em;
+    color: var(--accent); font-variant-numeric: tabular-nums;
+  }
+
+  label { display: block; font-size: .87rem; opacity: .75; margin-bottom: 4px; }
+  input[type=text], textarea {
+    width: 100%; font-family: inherit; font-size: 1rem;
+    padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
+    background: transparent; color: inherit; margin-bottom: 14px;
+  }
+  textarea {
+    font-family: ui-monospace, Menlo, monospace; font-size: .82rem;
+    min-height: 12rem; resize: vertical;
+  }
+  button {
+    width: 100%; padding: 14px; font-family: inherit; font-size: 1rem; font-weight: 600;
+    border: 0; border-radius: 8px; background: var(--accent); color: #fff;
+  }
+
+  ol { padding-left: 1.3rem; font-size: .95rem; margin: 0; }
+  li { margin-bottom: 8px; }
+  details { margin-top: 14px; font-size: .92rem; }
+  summary { cursor: pointer; opacity: .75; }
+  .quiet { font-size: .85rem; opacity: .65; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+  <h1>Fassistant</h1>
+  <p class="sub">Tap to download, then open the file to install.</p>
+
+  <h2>Install</h2>
+  <a class="dl" href="probe.apk"><b><span class="n">1</span>Probe</b><span>Run this first. It reports what this phone allows.</span></a>
+  <a class="dl" href="fassistant.apk"><b><span class="n">2</span>Fassistant</b><span>The watchdog itself, version 0.1.0.</span></a>
+
+  <details>
+    <summary>The download will not install</summary>
+    <ol>
+      <li>Android asks once whether to allow installs from your browser. Allow it.</li>
+      <li>On some phones the switch is under Settings &rarr; Apps &rarr; Special access &rarr; Install unknown apps.</li>
+    </ol>
+  </details>
+
+  <h2>Send the probe results back</h2>
+  <ol>
+    <li>Open <b>Probe</b>, tap <b>Run the checks</b>, then <b>Copy results</b>.</li>
+    <li>Come back here, paste into the box, and send.</li>
+  </ol>
+
+  <form method="post" action="/results" style="margin-top:18px">
+    <label for="label">Which phone is this?</label>
+    <input type="text" id="label" name="label" placeholder="e.g. Pixel 3a, Android 10" autocomplete="off">
+
+    <label for="results">Probe results</label>
+    <textarea id="results" name="results" placeholder="Paste here" spellcheck="false" autocapitalize="off"></textarea>
+
+    <button type="submit">Send</button>
+  </form>
+  <p class="quiet">This goes straight to the laptop, not to the internet. Send one per phone.</p>
+
+  <h2>Then set the watchdog up</h2>
+  <ol>
+    <li>Open <b>Fassistant</b> and work down the <b>Permissions</b> list, tapping <b>Fix</b> on each row.</li>
+    <li>Tap <b>Manufacturer settings</b> and work through that checklist.</li>
+    <li>Tap <b>Add apps</b> and pick what to watch. Each row shows how well that app can be detected.</li>
+  </ol>
+
+  <p class="quiet"><a href="/results/">See what has been sent so far</a></p>
+
+</body>
+</html>

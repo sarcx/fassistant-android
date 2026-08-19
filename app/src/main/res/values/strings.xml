@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fassistant</string>
+    <string name="admin_description">Prevents this watchdog from being uninstalled or force-stopped.</string>
+
+    <!-- Main screen -->
+    <string name="main_status_running">Watchdog running</string>
+    <string name="main_status_stopped">Watchdog stopped</string>
+    <string name="main_version">Version %1$s (%2$d)</string>
+    <string name="main_last_tick">Last check %1$s</string>
+    <string name="main_never">never</string>
+    <string name="main_watched_heading">Watched apps</string>
+    <string name="main_watched_empty">No apps yet. Add the ones that should never stay dead.</string>
+    <string name="main_add_apps">Add apps</string>
+    <string name="main_start">Start watchdog</string>
+    <string name="main_stop">Stop watchdog</string>
+    <string name="main_permissions_heading">Permissions</string>
+    <string name="main_oem_setup">Manufacturer settings</string>
+    <string name="main_view_log">View log</string>
+    <string name="main_check_now">Check now</string>
+    <string name="main_enumeration_exact">This phone allows process checks, so deaths are detected exactly.</string>
+    <string name="main_enumeration_inferred">This phone hides other apps\' processes, so deaths are inferred from notifications and media sessions.</string>
+
+    <!-- Permission rows -->
+    <string name="grant_overlay">Draw over other apps</string>
+    <string name="grant_overlay_why">Without this, Android silently refuses to let us reopen anything.</string>
+    <string name="grant_usage">Usage access</string>
+    <string name="grant_usage_why">Tells us which app is in front.</string>
+    <string name="grant_notifications">Notification access</string>
+    <string name="grant_notifications_why">Our strongest signal that an app has died.</string>
+    <string name="grant_battery">Unrestricted battery</string>
+    <string name="grant_battery_why">Stops Android delaying our checks while the screen is off.</string>
+    <string name="grant_granted">Granted</string>
+    <string name="grant_missing">Missing</string>
+    <string name="grant_fix">Fix</string>
+
+    <!-- Picker -->
+    <string name="picker_title">Add apps</string>
+    <string name="picker_search">Search installed apps</string>
+    <string name="picker_watched_count">%1$d watched</string>
+    <string name="picker_loading">Reading installed apps…</string>
+    <string name="picker_tap_to_watch">Tap to watch</string>
+    <string name="picker_not_selectable">Not selectable</string>
+
+    <!-- Detectability badges -->
+    <string name="badge_exact">Exact</string>
+    <string name="badge_exact_why">This phone lets us check the process directly.</string>
+    <string name="badge_strong">Strong</string>
+    <string name="badge_strong_notification">Seen with an ongoing notification.</string>
+    <string name="badge_strong_media">Seen playing media.</string>
+    <string name="badge_weak">Weak</string>
+    <string name="badge_weak_why">No signal seen yet, so this app can only be reopened on a timer. The badge improves by itself if a signal appears.</string>
+    <string name="badge_no_launcher">No launcher</string>
+    <string name="badge_no_launcher_why">This app has no screen to open, so it can never be reopened.</string>
+
+    <!-- App detail -->
+    <string name="detail_mode_heading">When to reopen it</string>
+    <string name="detail_mode_on_signal">Only when it dies</string>
+    <string name="detail_mode_on_signal_why">Reopen the moment a death signal arrives. Nothing happens otherwise.</string>
+    <string name="detail_mode_keep_in_front">Keep it in front</string>
+    <string name="detail_mode_keep_in_front_why">Reopen whenever it has not been the app on screen for a while. One app at a time.</string>
+    <string name="detail_mode_sweep">Reopen on a timer</string>
+    <string name="detail_mode_sweep_why">Reopen periodically whether or not we can tell it died. Interrupts whatever is on screen.</string>
+    <string name="detail_grace">Wait before reopening: %1$s</string>
+    <string name="detail_sweep_every">Reopen every: %1$s</string>
+    <string name="detail_history_heading">History</string>
+    <string name="detail_last_alive">Last seen alive %1$s</string>
+    <string name="detail_last_relaunch">Last reopened %1$s</string>
+    <string name="detail_relaunch_count">Reopened %1$d times</string>
+    <string name="detail_watch">Watch this app</string>
+    <string name="detail_stop_watching">Stop watching</string>
+    <string name="detail_uninstalled">This app is no longer installed.</string>
+
+    <!-- Manufacturer setup -->
+    <string name="oem_title">Manufacturer settings</string>
+    <string name="oem_intro">Phone makers add their own app killers that no permission covers. Open each screen below and allow Fassistant to start on its own and run without battery limits.</string>
+    <string name="oem_open">Open</string>
+    <string name="oem_none">Nothing extra found for this phone. Its manufacturer settings may still be worth a look.</string>
+    <string name="oem_mark_done">I have done this</string>
+    <string name="oem_autostart">Allow it to start on its own</string>
+    <string name="oem_battery">Remove battery restrictions</string>
+    <string name="oem_protected">Keep it running in the background</string>
+    <string name="oem_app_details">App info</string>
+
+    <!-- Log -->
+    <string name="log_title">Log</string>
+    <string name="log_empty">Nothing logged yet.</string>
+    <string name="log_share">Copy</string>
+    <string name="log_copied">Log copied.</string>
+
+    <!-- Notification -->
+    <string name="notif_channel">Watchdog status</string>
+    <string name="notif_title">Watching %1$d apps</string>
+    <string name="notif_title_none">Watching nothing yet</string>
+    <string name="notif_text">Version %1$s · %2$s</string>
+    <string name="notif_text_relaunched">reopened %1$s</string>
+    <string name="notif_text_all_alive">all alive</string>
+    <string name="blocked_title">Could not reopen %1$s</string>
+    <string name="blocked_text">Android blocked the reopen. Tap here to open it now, then grant Fassistant the \"Draw over other apps\" permission so it can do this on its own.</string>
+
+    <!-- Durations -->
+    <string name="duration_seconds">%1$d seconds</string>
+    <string name="duration_minutes">%1$d minutes</string>
+    <string name="duration_hours">%1$d hours</string>
+    <string name="duration_days">%1$d days</string>
+    <string name="duration_just_now">just now</string>
+    <string name="duration_ago">%1$s ago</string>
+</resources>
