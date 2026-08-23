@@ -16,10 +16,14 @@ The app can now update itself, and releases are built by CI.
 - Tagging `v<version>` builds, signs and publishes a release, then deletes older releases so only
   the newest is ever published.
 
-**The signing key has moved out of the repository.** It was committed while this was local-only;
-that is not safe for a public repo, because the key is exactly what installed copies use to decide
-an update is genuine. It now lives outside the repo, is read from `local.properties` or CI secrets,
-and `*.jks` is gitignored. The key itself is unchanged, so phones running 0.1.0 upgrade in place.
+**The signing key has moved out of the repository, and has been replaced.** It was committed while
+this was local-only; that is not safe for a public repo, because the key is exactly what installed
+copies use to decide an update is genuine. The new key is RSA 4096 with a generated password, read
+from `local.properties` or CI secrets, and `*.jks` is gitignored.
+
+Because the key changed, **0.1.0 has to be uninstalled before 0.2.0 can be installed** — Android
+refuses an update signed by a different key. This is the only release that needs that; 0.2.0
+onwards upgrades in place.
 
 ## 0.1.0
 
