@@ -83,6 +83,19 @@ class Watchlist private constructor(private val prefs: SharedPreferences) {
         get() = prefs.getBoolean(KEY_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_ENABLED, value).apply()
 
+    /** Empty means fall back to the URL baked in at build time. */
+    var updateUrl: String
+        get() = prefs.getString(KEY_UPDATE_URL, "").orEmpty()
+        set(value) = prefs.edit().putString(KEY_UPDATE_URL, value.trim()).apply()
+
+    var lastUpdateCheckAt: Long
+        get() = prefs.getLong(KEY_UPDATE_CHECKED, 0L)
+        set(value) = prefs.edit().putLong(KEY_UPDATE_CHECKED, value).apply()
+
+    var updateChecksEnabled: Boolean
+        get() = prefs.getBoolean(KEY_UPDATE_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_UPDATE_ENABLED, value).apply()
+
     fun oemStepDone(id: String): Boolean = prefs.getBoolean("oem_$id", false)
 
     fun setOemStepDone(id: String, done: Boolean) = prefs.edit().putBoolean("oem_$id", done).apply()
@@ -161,6 +174,9 @@ class Watchlist private constructor(private val prefs: SharedPreferences) {
         private const val KEY_OBSERVATIONS = "observations"
         private const val KEY_TICK = "tick_ms"
         private const val KEY_ENABLED = "enabled"
+        private const val KEY_UPDATE_URL = "update_url"
+        private const val KEY_UPDATE_CHECKED = "update_checked_at"
+        private const val KEY_UPDATE_ENABLED = "update_checks_enabled"
 
         @Volatile
         private var instance: Watchlist? = null

@@ -89,14 +89,18 @@ a{{display:inline-block;margin-top:20px}}</style></head><body>
 
 
 def stage_apks(into: Path):
-    """Copy the built APKs in under stable names, so the page can link to them."""
-    newest_app = sorted((REPO / "dist").glob("fassistant-*.apk"), key=lambda p: p.stat().st_mtime)
+    """Copy the built artefacts in under stable names, so the page can link to them.
+
+    update.json is staged too, which makes this server usable as the update source for a phone on
+    the same network — point the app's update address at http://<this-host>:<port>/update.json.
+    """
     wanted = {
-        "fassistant.apk": newest_app[-1] if newest_app else None,
+        "fassistant.apk": REPO / "dist/fassistant.apk",
+        "update.json": REPO / "dist/update.json",
         "probe.apk": REPO / "probe/build/outputs/apk/debug/probe-debug.apk",
     }
     for name, source in wanted.items():
-        if source and source.is_file():
+        if source.is_file():
             shutil.copy2(source, into / name)
             print(f"staged {name} from {source.relative_to(REPO)}", flush=True)
         else:

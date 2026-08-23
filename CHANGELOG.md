@@ -1,6 +1,27 @@
 # Changelog
 
-## 0.1.0 (unreleased)
+## 0.2.0
+
+The app can now update itself, and releases are built by CI.
+
+- Checks one URL once a day for a newer build, downloads it, and offers it. The address is baked in
+  at build time and points at this repository's latest release, so it never has to change.
+- Two checks before you are ever asked to install: the SHA-256 from the manifest, and the APK's
+  signing certificate, which must match the running app's.
+- The install itself is a normal Android confirmation. Silent installation needs device owner or
+  root, so it is not available here.
+- New **Updates** screen: current version, what is available, the release notes, and an address
+  field for installing from somewhere else — a machine on your own network, for instance.
+- **Install unknown apps** joins the permissions list on Android 8 and later, with a deep link.
+- Tagging `v<version>` builds, signs and publishes a release, then deletes older releases so only
+  the newest is ever published.
+
+**The signing key has moved out of the repository.** It was committed while this was local-only;
+that is not safe for a public repo, because the key is exactly what installed copies use to decide
+an update is genuine. It now lives outside the repo, is read from `local.properties` or CI secrets,
+and `*.jks` is gitignored. The key itself is unchanged, so phones running 0.1.0 upgrade in place.
+
+## 0.1.0
 
 First build. Runs on a OnePlus 5T (Android 10); long-running survival is not yet soak-tested.
 

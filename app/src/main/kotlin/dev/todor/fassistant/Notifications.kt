@@ -8,11 +8,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import dev.todor.fassistant.ui.MainActivity
+import dev.todor.fassistant.ui.UpdateActivity
 
 object Notifications {
 
     const val STATUS_ID = 1
 
+    private const val UPDATE_ID = 2
     private const val CHANNEL_STATUS = "status"
 
     fun ensureChannel(ctx: Context) {
@@ -75,6 +77,27 @@ object Notifications {
     }
 
     fun clearBlocked(ctx: Context, pkg: String) = manager(ctx)?.cancel(idFor(pkg))
+
+    /**
+     * Opens the update screen rather than installing directly. The confirmation dialog is an
+     * activity, so it has to be started by something the user touched.
+     */
+    fun postUpdateAvailable(ctx: Context, versionName: String) {
+        val open = PendingIntent.getActivity(
+            ctx,
+            UPDATE_ID,
+            Intent(ctx, UpdateActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        val notification = builder(ctx)
+            .setSmallIcon(android.R.drawable.stat_sys_download_done)
+            .setContentTitle(ctx.getString(R.string.update_notification_title, versionName))
+            .setContentText(ctx.getString(R.string.update_notification_text))
+            .setContentIntent(open)
+            .setAutoCancel(true)
+            .build()
+        manager(ctx)?.notify(UPDATE_ID, notification)
+    }
 
     private fun idFor(pkg: String) = 2000 + (pkg.hashCode() and 0x7fff)
 

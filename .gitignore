@@ -8,4 +8,10 @@ local.properties
 
 # Staged in by tools/serve-and-collect.py, and whatever the phones send back.
 tools/serve/*.apk
+tools/serve/update.json
 tools/serve/results/
+
+# The signing key must never be committed: this repo is public, and that key is what
+# installed copies use to decide an update is genuine. See local.properties.example.
+*.jks
+*.keystore

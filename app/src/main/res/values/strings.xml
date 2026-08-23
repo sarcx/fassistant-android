@@ -30,6 +30,8 @@
     <string name="grant_notifications_why">Our strongest signal that an app has died.</string>
     <string name="grant_battery">Unrestricted battery</string>
     <string name="grant_battery_why">Stops Android delaying our checks while the screen is off.</string>
+    <string name="grant_install">Install unknown apps</string>
+    <string name="grant_install_why">Lets Fassistant install its own updates.</string>
     <string name="grant_granted">Granted</string>
     <string name="grant_missing">Missing</string>
     <string name="grant_fix">Fix</string>
@@ -81,6 +83,27 @@
     <string name="oem_battery">Remove battery restrictions</string>
     <string name="oem_protected">Keep it running in the background</string>
     <string name="oem_app_details">App info</string>
+
+    <!-- Updates -->
+    <string name="update_title">Updates</string>
+    <string name="update_check_now">Check for an update</string>
+    <string name="update_checking">Checking…</string>
+    <string name="update_up_to_date">This is the newest version.</string>
+    <string name="update_found">Version %1$s is ready to install.</string>
+    <string name="update_install">Install %1$s</string>
+    <string name="update_failed">Could not check: %1$s</string>
+    <string name="update_not_configured">No update source is set, so this copy will not update itself.</string>
+    <string name="update_source">Checking %1$s</string>
+    <string name="update_source_heading">Update source</string>
+    <string name="update_url_hint">Leave empty to use the built-in address</string>
+    <string name="update_url_why">Point this at a different address to install from somewhere else, such as a machine on your own network.</string>
+    <string name="update_save_url">Save address</string>
+    <string name="update_url_saved">Address saved.</string>
+    <string name="update_needs_unknown_sources">Android will refuse until Fassistant is allowed to install apps.</string>
+    <string name="update_install_failed">Could not start the install.</string>
+    <string name="update_notification_title">Fassistant %1$s is ready</string>
+    <string name="update_notification_text">Tap to install it.</string>
+    <string name="main_updates">Updates</string>
 
     <!-- Log -->
     <string name="log_title">Log</string>

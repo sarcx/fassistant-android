@@ -8,6 +8,7 @@ plugins {
 android {
     namespace = "dev.todor.fassistant.probe"
     compileSdk = 36
+    buildToolsVersion = "36.1.0"
 
     defaultConfig {
         applicationId = "dev.todor.fassistant.probe"
@@ -18,20 +19,7 @@ android {
         versionName = "probe"
     }
 
-    signingConfigs {
-        create("local") {
-            storeFile = rootProject.file("keystore/fassistant.jks")
-            storePassword = "fassistant"
-            keyAlias = "fassistant"
-            keyPassword = "fassistant"
-        }
-    }
-
-    buildTypes {
-        getByName("debug") {
-            signingConfig = signingConfigs.getByName("local")
-        }
-    }
+    // Signed with the local debug key. This is a throwaway diagnostic, never upgraded in place.
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

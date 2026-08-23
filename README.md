@@ -106,10 +106,70 @@ relies on, so the two must move together.
 
 ## Signing
 
-An unsigned APK cannot be installed, so `keystore/fassistant.jks` is committed with a throwaway
-password. That is on purpose: the signature has to stay stable for `adb install -r` to upgrade in
-place, and a debug keystore tied to one machine would break that. Anyone with this repo can build an
-update these phones will accept. Fine for personal devices; not fine if that ever changes.
+An unsigned APK cannot be installed, and every build has to carry the *same* signature or it cannot
+replace an installed copy — Android rejects an update signed with a different key. That makes the
+signing key the thing installed copies trust, which is why it is **not in this repository**.
+
+Put it somewhere outside the repo and point `local.properties` at it (see
+`local.properties.example`). Without it the build still works, signed with the local debug key; it
+just cannot upgrade a phone in place.
+
+CI reads the same key from repository secrets:
+
+| Secret | Contents |
+| --- | --- |
+| `KEYSTORE_BASE64` | the keystore file, base64-encoded |
+| `KEYSTORE_PASSWORD` | store password |
+| `KEY_ALIAS` | key alias |
+| `KEY_PASSWORD` | key password |
+
+Encode the keystore with `base64 -i /path/to/fassistant.jks | pbcopy` and paste it into the secret.
+Never commit it, and never print it into a log.
+
+## Updating itself
+
+The app checks one URL once a day, downloads a newer build, and offers it. Nothing else leaves the
+phone.
+
+`FASSISTANT_UPDATE_URL` is baked in at build time; CI sets it to this repository's latest release, so
+the address never changes as versions come and go:
+
+```
+https://github.com/<owner>/<repo>/releases/latest/download/update.json
+```
+
+Two checks stand between a download and an install prompt — the SHA-256 from the manifest, and the
+APK's signing certificate, which must match the running app's. The second is the one that matters:
+Android would refuse a mismatched update anyway, so the check only means you are never asked to
+approve something that could not work.
+
+The install itself cannot be silent. That needs device owner or root, so every update ends with one
+tap on the standard Android install screen. The confirmation is an activity, so it is only ever
+started from a notification tap or the Updates screen — starting it from the service would hit the
+same background restriction that blocks reopening apps.
+
+Override the address per phone on the **Updates** screen, which is how you test an update from a
+machine on your own network before publishing it:
+
+```
+./gradlew :app:dist
+tools/serve-and-collect.py         # also serves update.json
+```
+
+## Releasing
+
+`VERSION_NAME` and `VERSION_CODE` in `gradle.properties` stay the single source of truth. To cut a
+release, bump both, write a `CHANGELOG.md` section, and push a matching tag:
+
+```
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+`.github/workflows/release.yml` then builds, signs, publishes `fassistant.apk` and `update.json` as
+release assets, and **deletes every older release** so only the newest is ever published. Tags are
+left alone, so history stays intact. The workflow refuses to run if the tag and `VERSION_NAME`
+disagree, or if that version is already released.
 
 ## Versions
 

@@ -66,6 +66,7 @@ class MainActivity : Activity() {
 
         addView(heading(getString(R.string.main_oem_setup)))
         addView(button(getString(R.string.main_oem_setup)) { open(OemSetupActivity::class.java) })
+        addView(button(getString(R.string.main_updates)) { open(UpdateActivity::class.java) })
         addView(button(getString(R.string.main_view_log)) { open(LogActivity::class.java) })
     }
 

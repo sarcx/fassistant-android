@@ -13,6 +13,9 @@ import android.os.Looper
 import android.os.PowerManager
 import dev.todor.fassistant.liveness.Ladder
 import dev.todor.fassistant.liveness.Liveness
+import dev.todor.fassistant.update.CheckResult
+import dev.todor.fassistant.update.UpdateChecker
+import java.util.concurrent.Executors
 
 class WatchdogService : Service() {
 
@@ -20,9 +23,14 @@ class WatchdogService : Service() {
     private lateinit var ladder: Ladder
     private lateinit var relauncher: Relauncher
     private lateinit var log: DeathLog
+    private lateinit var updateChecker: UpdateChecker
 
     private val handler = Handler(Looper.getMainLooper())
     private val awaitingProof = HashMap<String, Long>()
+    private val background = Executors.newSingleThreadExecutor()
+
+    @Volatile
+    private var updateCheckRunning = false
 
     private val tickRunnable = Runnable { tick("timer") }
 
@@ -36,6 +44,7 @@ class WatchdogService : Service() {
         log = DeathLog(this)
         ladder = Ladder(this, watchlist)
         relauncher = Relauncher(this, watchlist, log)
+        updateChecker = UpdateChecker(this, watchlist, log)
 
         Notifications.ensureChannel(this)
         runCatching {
@@ -79,6 +88,7 @@ class WatchdogService : Service() {
     override fun onDestroy() {
         running = false
         handler.removeCallbacks(tickRunnable)
+        background.shutdownNow()
         runCatching { unregisterReceiver(screenReceiver) }
         log.line("service destroyed")
         if (watchlist.enabled) TickAlarm.schedule(this, RESTART_DELAY_MS)
@@ -127,6 +137,25 @@ class WatchdogService : Service() {
             }
         }
         showStatus(reopened)
+        maybeCheckForUpdate(now)
+    }
+
+    /**
+     * Once a day, off the tick thread. Networking must not happen on the main thread, and a slow
+     * server must never delay a relaunch.
+     */
+    private fun maybeCheckForUpdate(now: Long) {
+        if (!watchlist.updateChecksEnabled || updateCheckRunning) return
+        if (!updateChecker.dueForCheck(now)) return
+
+        updateCheckRunning = true
+        background.execute {
+            val result = runCatching { updateChecker.check(System.currentTimeMillis()) }.getOrNull()
+            updateCheckRunning = false
+            if (result is CheckResult.Ready) {
+                Notifications.postUpdateAvailable(this, result.update.manifest.versionName)
+            }
+        }
     }
 
     private fun applyPolicy(app: WatchedApp, now: Long): Boolean = when (app.mode) {

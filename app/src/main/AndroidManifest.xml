@@ -9,6 +9,10 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Self-update: one configurable URL, nothing else leaves the phone. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <!-- Not grantable at install time; granted per phone with
          adb shell appops set dev.todor.fassistant GET_USAGE_STATS allow -->
     <uses-permission
@@ -56,6 +60,13 @@
             android:label="@string/log_title"
             android:parentActivityName=".ui.MainActivity" />
 
+        <activity
+            android:name=".ui.UpdateActivity"
+            android:exported="false"
+            android:label="@string/update_title"
+            android:launchMode="singleTop"
+            android:parentActivityName=".ui.MainActivity" />
+
         <service
             android:name=".WatchdogService"
             android:exported="false"
@@ -91,6 +102,10 @@
 
         <receiver
             android:name=".TickAlarm"
+            android:exported="false" />
+
+        <receiver
+            android:name=".update.InstallResultReceiver"
             android:exported="false" />
 
         <receiver
