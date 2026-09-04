@@ -9,6 +9,12 @@
     <string name="main_version">Version %1$s (%2$d)</string>
     <string name="main_last_tick">Last check %1$s</string>
     <string name="main_never">never</string>
+    <string name="main_revival">Restart alarm: %1$s · Scheduled job: %2$s</string>
+    <string name="main_yes">yes</string>
+    <string name="main_no">no</string>
+    <string name="main_force_stopped">Something force-stopped Fassistant. Android clears a stopped app\'s alarms and withholds its broadcasts, so it cannot start itself again — not even after a reboot. Work through Manufacturer settings to stop this happening again.</string>
+    <string name="main_gaps_heading">Times it was not running</string>
+    <string name="main_gap_entry">%1$s, ending %2$s</string>
     <string name="main_watched_heading">Watched apps</string>
     <string name="main_watched_empty">No apps yet. Add the ones that should never stay dead.</string>
     <string name="main_add_apps">Add apps</string>

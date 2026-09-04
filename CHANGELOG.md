@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.5.0
+
+Makes downtime visible. After a week of running, the app stopped and could say nothing about it —
+not even when. The tick timestamp only ever lived in memory, so it died with the process.
+
+- The tick is now written to disk, at most once a minute. Downtime survives the process being
+  killed, so the main screen can say when the watchdog last actually ran.
+- On starting, the service compares that timestamp with the clock and records any real gap. The
+  main screen lists recent ones with how long each lasted.
+- The main screen reports whether the restart alarm and the scheduled job still exist. If the
+  service is stopped and both are gone, it says so plainly: **that is what a force-stop looks
+  like**, and a force-stopped app cannot restart itself.
+
+That last point is the honest answer to why nothing recovered. Android clears a stopped package's
+alarms and withholds its broadcasts, so every one of the five restart paths is disabled at once,
+reboot included. It is deliberate platform behaviour, not a fault in the mesh, and nothing an
+ordinary app can do will get around it — which is why the manufacturer settings matter so much on
+phones that force-stop apps on their own.
+
 ## 0.4.1
 
 Fixes self-update, which never worked. Every update was rejected as "signed by someone else",

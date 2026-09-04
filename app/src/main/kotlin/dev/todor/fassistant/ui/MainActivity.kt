@@ -14,6 +14,8 @@ import dev.todor.fassistant.GrantState
 import dev.todor.fassistant.Grants
 import dev.todor.fassistant.Protection
 import dev.todor.fassistant.R
+import dev.todor.fassistant.TickAlarm
+import dev.todor.fassistant.TickJob
 import dev.todor.fassistant.WatchdogService
 import dev.todor.fassistant.Watchlist
 
@@ -39,7 +41,32 @@ class MainActivity : Activity() {
 
         val statusRes = if (WatchdogService.running) R.string.main_status_running else R.string.main_status_stopped
         addView(body(getString(statusRes)))
-        addView(caption(getString(R.string.main_last_tick, formatAgo(WatchdogService.lastTickAt))))
+        addView(caption(getString(R.string.main_last_tick, formatAgo(watchlist.heartbeatAt))))
+
+        val alarmAlive = TickAlarm.isScheduled(this@MainActivity)
+        val jobAlive = TickJob.isScheduled(this@MainActivity)
+        addView(caption(getString(R.string.main_revival, yesNo(alarmAlive), yesNo(jobAlive))))
+        if (!alarmAlive && !jobAlive && !WatchdogService.running) {
+            addView(spacer(6))
+            addView(body(getString(R.string.main_force_stopped)))
+        }
+
+        val gaps = watchlist.gaps()
+        if (gaps.isNotEmpty()) {
+            addView(spacer(10))
+            addView(caption(getString(R.string.main_gaps_heading)))
+            gaps.take(5).forEach { gap ->
+                addView(
+                    caption(
+                        getString(
+                            R.string.main_gap_entry,
+                            formatDuration(gap.last - gap.first),
+                            formatAgo(gap.last),
+                        )
+                    )
+                )
+            }
+        }
         addView(spacer(4))
         val detectionRes = if (WatchdogService.processChecksWork) {
             R.string.main_enumeration_exact
@@ -145,6 +172,8 @@ class MainActivity : Activity() {
         if (watchlist.enabled) WatchdogService.start(this, "switched on") else WatchdogService.stop(this)
         recreate()
     }
+
+    private fun yesNo(value: Boolean) = getString(if (value) R.string.main_yes else R.string.main_no)
 
     private fun labelOf(pkg: String): CharSequence = runCatching {
         packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0))

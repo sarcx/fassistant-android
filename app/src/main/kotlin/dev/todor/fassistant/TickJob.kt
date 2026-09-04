@@ -35,6 +35,11 @@ class TickJob : JobService() {
             runCatching { scheduler.schedule(job) }
         }
 
+        fun isScheduled(ctx: Context): Boolean {
+            val scheduler = ctx.getSystemService(Context.JOB_SCHEDULER_SERVICE) as? JobScheduler ?: return false
+            return scheduler.allPendingJobs.any { it.id == JOB_ID }
+        }
+
         fun cancel(ctx: Context) {
             val scheduler = ctx.getSystemService(Context.JOB_SCHEDULER_SERVICE) as? JobScheduler ?: return
             scheduler.cancel(JOB_ID)

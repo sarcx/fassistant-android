@@ -65,6 +65,7 @@ class WatchdogService : Service() {
         running = true
         log.line("service started")
         log.logOwnExits(this)
+        noticeDowntime()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -109,10 +110,34 @@ class WatchdogService : Service() {
         }
     }
 
+    /**
+     * Compares the last heartbeat on disk with now. Any sizeable gap means the service was not
+     * running, which is the only record of it that survives the process being killed.
+     */
+    private fun noticeDowntime() {
+        val previous = watchlist.heartbeatAt
+        if (previous <= 0L) return
+
+        val now = System.currentTimeMillis()
+        val gap = now - previous
+        if (gap < maxOf(watchlist.tickMs * 3, MIN_GAP_MS)) return
+
+        watchlist.recordGap(previous, now)
+        log.line("was not running for ${gap / 60_000} minutes")
+
+        // A force-stop clears alarms and jobs and blocks broadcasts, so a stopped app cannot bring
+        // itself back. If neither survived, that is what happened — worth stating rather than
+        // leaving the user to wonder why nothing restarted.
+        if (!TickAlarm.isScheduled(this) && !TickJob.isScheduled(this)) {
+            log.line("its alarm and job were both gone, so it had been force-stopped")
+        }
+    }
+
     private fun sweep(reason: String) {
         val now = System.currentTimeMillis()
         lastTickAt = now
         lastTickReason = reason
+        if (now - watchlist.heartbeatAt > Watchlist.HEARTBEAT_WRITE_MS) watchlist.heartbeatAt = now
 
         ladder.refresh(now)
         processChecksWork = ladder.process.available()
@@ -253,6 +278,7 @@ class WatchdogService : Service() {
         private const val PROOF_WINDOW_MS = 30_000L
         private const val RESTART_DELAY_MS = 1_000L
         private const val SETTLE_MS = 900L
+        private const val MIN_GAP_MS = 120_000L
 
         @Volatile
         var running = false

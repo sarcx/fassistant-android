@@ -30,6 +30,17 @@ class TickAlarm : BroadcastReceiver() {
             alarms.cancel(pendingIntent(ctx))
         }
 
+        /**
+         * Whether the alarm still exists. A force-stop clears a package's alarms, so this
+         * disappearing is evidence of what happened rather than of a crash.
+         */
+        fun isScheduled(ctx: Context): Boolean = PendingIntent.getBroadcast(
+            ctx,
+            0,
+            Intent(ctx, TickAlarm::class.java),
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
+        ) != null
+
         private fun pendingIntent(ctx: Context): PendingIntent = PendingIntent.getBroadcast(
             ctx,
             0,

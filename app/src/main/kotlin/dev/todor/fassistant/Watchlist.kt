@@ -84,6 +84,30 @@ class Watchlist private constructor(private val prefs: SharedPreferences) {
         set(value) = prefs.edit().putBoolean(KEY_ENABLED, value).apply()
 
     /**
+     * Written to disk as the service ticks, so downtime is still measurable after the process dies.
+     * Kept deliberately coarse: the point is to spot a gap of hours, not to log every tick.
+     */
+    var heartbeatAt: Long
+        get() = prefs.getLong(KEY_HEARTBEAT, 0L)
+        set(value) = prefs.edit().putLong(KEY_HEARTBEAT, value).apply()
+
+    /** Stretches where the service was not ticking, newest first. */
+    fun gaps(): List<LongRange> {
+        val array = JSONArray(prefs.getString(KEY_GAPS, "[]") ?: "[]")
+        return (0 until array.length()).mapNotNull { index ->
+            val entry = array.optJSONObject(index) ?: return@mapNotNull null
+            entry.optLong("from")..entry.optLong("to")
+        }
+    }
+
+    fun recordGap(from: Long, to: Long) {
+        val kept = JSONArray()
+        kept.put(JSONObject().put("from", from).put("to", to))
+        gaps().take(MAX_GAPS - 1).forEach { kept.put(JSONObject().put("from", it.first).put("to", it.last)) }
+        prefs.edit().putString(KEY_GAPS, kept.toString()).apply()
+    }
+
+    /**
      * Whether to put the screen back the way it was after reopening something. There is no way to
      * start another app's activity without it coming to the front, so the alternative to this is
      * being dropped into an app you did not open.
@@ -189,6 +213,10 @@ class Watchlist private constructor(private val prefs: SharedPreferences) {
         private const val KEY_OBSERVATIONS = "observations"
         private const val KEY_TICK = "tick_ms"
         private const val KEY_ENABLED = "enabled"
+        const val HEARTBEAT_WRITE_MS = 60_000L
+        private const val MAX_GAPS = 10
+        private const val KEY_HEARTBEAT = "heartbeat_at"
+        private const val KEY_GAPS = "gaps"
         private const val KEY_RETURN_TO_PREVIOUS = "return_to_previous"
         private const val KEY_UPDATE_URL = "update_url"
         private const val KEY_UPDATE_CHECKED = "update_checked_at"
