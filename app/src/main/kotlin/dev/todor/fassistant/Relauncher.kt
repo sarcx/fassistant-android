@@ -27,7 +27,9 @@ class Relauncher(
             return false
         }
         // No CLEAR_TASK on purpose — if the app is somehow alive, resume it rather than restart it.
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        // No animation, because the app is usually sent straight back again and the transition
+        // would be the most visible part of an operation meant to go unnoticed.
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION)
 
         return try {
             ctx.startActivity(intent)

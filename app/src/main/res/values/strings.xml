@@ -14,6 +14,9 @@
     <string name="main_add_apps">Add apps</string>
     <string name="main_start">Start watchdog</string>
     <string name="main_stop">Stop watchdog</string>
+    <string name="main_behaviour_heading">Behaviour</string>
+    <string name="main_return_to_previous">Go back to what I was doing</string>
+    <string name="main_return_to_previous_why">Android will not let an app be reopened without bringing it to the front, so Fassistant brings back whatever was on screen a moment later. You may still see it flick past. Apps set to \"keep it in front\" are left alone.</string>
     <string name="main_permissions_heading">Permissions</string>
     <string name="main_oem_setup">Manufacturer settings</string>
     <string name="main_view_log">View log</string>

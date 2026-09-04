@@ -83,6 +83,15 @@ class Watchlist private constructor(private val prefs: SharedPreferences) {
         get() = prefs.getBoolean(KEY_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_ENABLED, value).apply()
 
+    /**
+     * Whether to put the screen back the way it was after reopening something. There is no way to
+     * start another app's activity without it coming to the front, so the alternative to this is
+     * being dropped into an app you did not open.
+     */
+    var returnToPreviousApp: Boolean
+        get() = prefs.getBoolean(KEY_RETURN_TO_PREVIOUS, true)
+        set(value) = prefs.edit().putBoolean(KEY_RETURN_TO_PREVIOUS, value).apply()
+
     /** Empty means fall back to the URL baked in at build time. */
     var updateUrl: String
         get() = prefs.getString(KEY_UPDATE_URL, "").orEmpty()
@@ -180,6 +189,7 @@ class Watchlist private constructor(private val prefs: SharedPreferences) {
         private const val KEY_OBSERVATIONS = "observations"
         private const val KEY_TICK = "tick_ms"
         private const val KEY_ENABLED = "enabled"
+        private const val KEY_RETURN_TO_PREVIOUS = "return_to_previous"
         private const val KEY_UPDATE_URL = "update_url"
         private const val KEY_UPDATE_CHECKED = "update_checked_at"
         private const val KEY_UPDATE_ENABLED = "update_checks_enabled"

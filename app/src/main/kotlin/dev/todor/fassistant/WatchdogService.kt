@@ -117,7 +117,10 @@ class WatchdogService : Service() {
         ladder.refresh(now)
         processChecksWork = ladder.process.available()
 
+        val wasInFront = ladder.foreground.topPackage()
         var reopened: String? = null
+        var wantsToStayInFront = false
+
         for (app in watchlist.all()) {
             proveOrWarn(app, now)
             val verdict = ladder.verdict(app, now)
@@ -134,10 +137,39 @@ class WatchdogService : Service() {
             if (didReopen) {
                 reopened = app.pkg
                 awaitingProof[app.pkg] = now
+                if (app.mode == Mode.KEEP_IN_FRONT) wantsToStayInFront = true
             }
         }
+
+        if (reopened != null && !wantsToStayInFront) restoreScreen(wasInFront, reopened)
         showStatus(reopened)
         maybeCheckForUpdate(now)
+    }
+
+    /**
+     * Puts the screen back where it was. Another app's activity cannot be started without coming to
+     * the front, so the only way not to be left staring at it is to bring back whatever was there
+     * before — once per tick, however many apps were reopened.
+     *
+     * Skipped entirely for an app in "keep it in front" mode, since that mode wants the opposite.
+     */
+    private fun restoreScreen(wasInFront: String?, reopened: String) {
+        if (!watchlist.returnToPreviousApp) return
+
+        val back = wasInFront
+            ?.takeIf { it != reopened }
+            ?.let { packageManager.getLaunchIntentForPackage(it) }
+            ?: Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+
+        back.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION)
+
+        // Long enough for the reopened app to get through onCreate, short enough not to be a
+        // visible detour. Its process stays alive once started, whether or not it is on screen.
+        handler.postDelayed({
+            if (!runCatching { startActivity(back) }.isSuccess) {
+                log.line("could not return the screen to ${wasInFront ?: "home"}")
+            }
+        }, SETTLE_MS)
     }
 
     /**
@@ -220,6 +252,7 @@ class WatchdogService : Service() {
         private const val WAKE_LOCK_MS = 10_000L
         private const val PROOF_WINDOW_MS = 30_000L
         private const val RESTART_DELAY_MS = 1_000L
+        private const val SETTLE_MS = 900L
 
         @Volatile
         var running = false

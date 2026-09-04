@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.widget.CheckBox
 import android.widget.LinearLayout
 import dev.todor.fassistant.Badge
 import dev.todor.fassistant.BuildConfig
@@ -51,6 +52,16 @@ class MainActivity : Activity() {
         val toggleRes = if (watchlist.enabled) R.string.main_stop else R.string.main_start
         addView(button(getString(toggleRes)) { toggleWatchdog() })
         addView(button(getString(R.string.main_check_now)) { WatchdogService.start(this@MainActivity, "manual"); recreate() })
+
+        addView(heading(getString(R.string.main_behaviour_heading)))
+        addView(
+            CheckBox(this@MainActivity).apply {
+                text = getString(R.string.main_return_to_previous)
+                isChecked = watchlist.returnToPreviousApp
+                setOnCheckedChangeListener { _, checked -> watchlist.returnToPreviousApp = checked }
+            }
+        )
+        addView(caption(getString(R.string.main_return_to_previous_why)))
 
         addView(heading(getString(R.string.main_permissions_heading)))
         Grants.all(this@MainActivity).forEach { addView(grantRow(it)) }

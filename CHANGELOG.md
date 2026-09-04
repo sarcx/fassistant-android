@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.0
+
+Reopening an app no longer leaves you looking at it.
+
+Android has no way to start another app's activity without bringing it to the front, so the app is
+reopened and then whatever was on screen before is brought back — once per check, however many apps
+were reopened. If nothing is known to have been in front, the home screen is used instead.
+
+- New **Go back to what I was doing** switch on the main screen, on by default.
+- Apps set to *keep it in front* are exempt, since that mode wants the opposite.
+- Reopening no longer animates, because the transition was the most visible part of an operation
+  meant to go unnoticed.
+
+Two honest limits. The app being reopened may still flick past for a moment; there is no way to
+avoid that without root or device owner. And a backgrounded app is easier for the system to kill
+than one on screen, so this trades a little survivability for not hijacking the screen — worth
+pairing with the battery exemptions from 0.3.0.
+
 ## 0.3.0
 
 Applies the phone's own anti-kill settings to the apps being watched, not just to Fassistant.
