@@ -1,6 +1,7 @@
 package dev.todor.fassistant.update
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import dev.todor.fassistant.BuildConfig
@@ -77,9 +78,9 @@ class UpdateChecker(
             }
         }
 
-        if (!signedLikeUs(target)) {
+        if (signatureCheck(target) == SignatureVerdict.MISMATCH) {
             target.delete()
-            throw IllegalStateException("that APK is signed by someone else")
+            throw IllegalStateException("that build is signed with a different key")
         }
 
         log.line("update ${manifest.versionName} (${manifest.versionCode}) downloaded and verified")
@@ -99,27 +100,55 @@ class UpdateChecker(
         return digest.digest().joinToString("") { "%02x".format(it) }
     }
 
-    @Suppress("DEPRECATION")
-    private fun signedLikeUs(apk: File): Boolean {
-        val pm = ctx.packageManager
-        val ours: List<ByteArray>
-        val theirs: List<ByteArray>
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val flag = PackageManager.GET_SIGNING_CERTIFICATES
-            ours = pm.getPackageInfo(ctx.packageName, flag).signingInfo
-                ?.apkContentsSigners?.map { it.toByteArray() } ?: return false
-            theirs = pm.getPackageArchiveInfo(apk.absolutePath, flag)?.signingInfo
-                ?.apkContentsSigners?.map { it.toByteArray() } ?: return false
-        } else {
-            val flag = PackageManager.GET_SIGNATURES
-            ours = pm.getPackageInfo(ctx.packageName, flag).signatures?.map { it.toByteArray() }
-                ?: return false
-            theirs = pm.getPackageArchiveInfo(apk.absolutePath, flag)?.signatures?.map { it.toByteArray() }
-                ?: return false
+    private enum class SignatureVerdict { MATCH, MISMATCH, UNKNOWN }
+
+    /**
+     * Compares the downloaded build's signing certificate with the running app's.
+     *
+     * Only MISMATCH blocks the install. Android itself refuses an update signed with a different
+     * key, so that refusal — not this check — is the actual guarantee; this only exists to give a
+     * clear reason instead of a failed install prompt. Treating "could not read the certificates"
+     * as a mismatch is therefore wrong, and was: on Android 9 and later,
+     * [PackageManager.getPackageArchiveInfo] returns a null `signingInfo` even when asked for
+     * signing certificates, which made every update look forged.
+     */
+    private fun signatureCheck(apk: File): SignatureVerdict {
+        val ours = certificatesOf { flag -> ctx.packageManager.getPackageInfo(ctx.packageName, flag) }
+        val theirs = certificatesOf { flag -> ctx.packageManager.getPackageArchiveInfo(apk.absolutePath, flag) }
+
+        if (ours.isEmpty() || theirs.isEmpty()) {
+            log.line("could not read signing certificates, leaving it to the installer")
+            return SignatureVerdict.UNKNOWN
         }
-        if (ours.isEmpty() || ours.size != theirs.size) return false
-        return ours.all { mine -> theirs.any { it.contentEquals(mine) } }
+
+        val match = theirs.containsAll(ours) || ours.containsAll(theirs)
+        if (!match) {
+            log.line("signing mismatch: installed ${fingerprint(ours)}, downloaded ${fingerprint(theirs)}")
+        }
+        return if (match) SignatureVerdict.MATCH else SignatureVerdict.MISMATCH
     }
+
+    /**
+     * Reads certificates the modern way, then the deprecated way. Both are needed: the modern
+     * fields are empty for an APK file, and the deprecated one is all that works there.
+     */
+    @Suppress("DEPRECATION")
+    private fun certificatesOf(lookup: (Int) -> PackageInfo?): List<String> {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val signing = runCatching { lookup(PackageManager.GET_SIGNING_CERTIFICATES)?.signingInfo }.getOrNull()
+            val modern = signing?.apkContentsSigners?.takeIf { it.isNotEmpty() }
+                ?: signing?.signingCertificateHistory
+            if (modern != null && modern.isNotEmpty()) return modern.map { sha256(it.toByteArray()) }
+        }
+        val legacy = runCatching { lookup(PackageManager.GET_SIGNATURES)?.signatures }.getOrNull()
+        return legacy?.map { sha256(it.toByteArray()) }.orEmpty()
+    }
+
+    private fun sha256(bytes: ByteArray): String =
+        MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
+
+    private fun fingerprint(certificates: List<String>): String =
+        certificates.joinToString(",") { it.take(16) }
 
     private fun fetchText(url: String): String = openStream(url).use { it.readBytes().decodeToString() }
 

@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.4.1
+
+Fixes self-update, which never worked. Every update was rejected as "signed by someone else",
+including genuine ones.
+
+On Android 9 and later, `getPackageArchiveInfo()` returns a null `signingInfo` even when asked for
+signing certificates, so the check read nothing for the downloaded file and treated that as proof
+of forgery. It now falls back to the deprecated `signatures` field, which is the only one populated
+for an APK file.
+
+The worse mistake was the design: an unreadable certificate was treated as a failed check. Android
+refuses an update signed with a different key by itself, so that refusal is the real guarantee and
+this check only exists to give a clear reason instead of a failed install prompt. It now blocks
+only on a genuine mismatch; if the certificates cannot be read it proceeds and lets the installer
+decide. A mismatch logs both fingerprints, so the next such failure can be diagnosed rather than
+guessed at.
+
+**This fix cannot arrive through the updater**, because the broken check is in the version you are
+running. Install 0.4.1 by hand once; self-update works from there on.
+
 ## 0.4.0
 
 Reopening an app no longer leaves you looking at it.
