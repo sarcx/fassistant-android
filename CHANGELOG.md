@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.3.0
+
+Applies the phone's own anti-kill settings to the apps being watched, not just to Fassistant.
+Stopping an app from being killed works better than reopening it afterwards.
+
+- **Keep watched apps alive** screen: every watched app with its battery status read live, and a
+  button per app that still has limits. Reachable from the main screen, which now says how many
+  watched apps can still be stopped to save battery.
+- The same section appears per app on its detail screen, next to the settings that decide what
+  happens once it does die.
+- Manufacturer autostart screens are offered here too. They list every app at once and the phone
+  gives no way to read back what was chosen, so they stay a manual checklist, now recorded per app.
+
+Only one of Fassistant's own permissions matters to a watched app's survival — the
+battery-optimisation exemption. Drawing over other apps, usage access and notification access
+decide what Fassistant may watch and start; they do nothing for whether a watched app stays
+resident, so they are deliberately not offered. The screen says so, rather than leaving it to be
+guessed at.
+
 ## 0.2.0
 
 The app can now update itself, and releases are built by CI.

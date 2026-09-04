@@ -1,6 +1,7 @@
 package dev.todor.fassistant.ui
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -13,6 +14,7 @@ import android.widget.Spinner
 import dev.todor.fassistant.Badge
 import dev.todor.fassistant.Detectabilities
 import dev.todor.fassistant.Mode
+import dev.todor.fassistant.Protection
 import dev.todor.fassistant.R
 import dev.todor.fassistant.WatchdogService
 import dev.todor.fassistant.WatchedApp
@@ -96,11 +98,50 @@ class AppDetailActivity : Activity() {
             })
         }
 
+        addView(heading(getString(R.string.protect_heading)))
+        addView(protectionRows())
+
         val observation = watchlist.observation(pkg)
         addView(heading(getString(R.string.detail_history_heading)))
         addView(caption(getString(R.string.detail_last_alive, formatAgo(observation.lastAliveAt))))
         addView(caption(getString(R.string.detail_last_relaunch, formatAgo(observation.lastRelaunchAt))))
         addView(caption(getString(R.string.detail_relaunch_count, observation.relaunchCount)))
+    }
+
+    /**
+     * The OS settings that keep *this* app alive, as opposed to the settings above, which decide
+     * what Fassistant does about it once it dies.
+     */
+    private fun protectionRows(): View = verticalLayout(padding = 0).apply {
+        val unrestricted = Protection.batteryUnrestricted(this@AppDetailActivity, pkg)
+        addView(
+            badge(
+                getString(if (unrestricted) R.string.protect_unrestricted else R.string.protect_restricted),
+                badgeColor(if (unrestricted) Badge.STRONG else Badge.WEAK),
+            ).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                )
+            }
+        )
+        addView(spacer(6))
+        addView(caption(getString(R.string.protect_battery_why)))
+        if (!unrestricted) {
+            Protection.batteryFixIntents(this@AppDetailActivity, pkg).firstOrNull()?.let { intent ->
+                addView(button(getString(R.string.protect_remove_limits)) { runCatching { startActivity(intent) } })
+            }
+        }
+        addView(spacer(8))
+        addView(
+            button(getString(R.string.protect_open_app_settings)) {
+                runCatching { startActivity(OemScreens.appInfo(this@AppDetailActivity, pkg).intent) }
+            }
+        )
+        addView(spacer(8))
+        addView(button(getString(R.string.protect_all_apps)) {
+            startActivity(Intent(this@AppDetailActivity, ProtectionActivity::class.java))
+        })
     }
 
     private fun modePicker(watched: WatchedApp): View = RadioGroup(this).apply {

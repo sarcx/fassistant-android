@@ -11,6 +11,7 @@ import dev.todor.fassistant.BuildConfig
 import dev.todor.fassistant.Detectabilities
 import dev.todor.fassistant.GrantState
 import dev.todor.fassistant.Grants
+import dev.todor.fassistant.Protection
 import dev.todor.fassistant.R
 import dev.todor.fassistant.WatchdogService
 import dev.todor.fassistant.Watchlist
@@ -61,6 +62,19 @@ class MainActivity : Activity() {
         } else {
             watched.forEach { addView(watchedRow(it.pkg)) }
         }
+        if (watched.isNotEmpty()) {
+            val restricted = watched.count { !Protection.batteryUnrestricted(this@MainActivity, it.pkg) }
+            addView(spacer(6))
+            addView(
+                if (restricted == 0) {
+                    caption(getString(R.string.protect_all_clear))
+                } else {
+                    body(getString(R.string.protect_restricted_count, restricted, watched.size))
+                }
+            )
+            addView(button(getString(R.string.protect_title)) { open(ProtectionActivity::class.java) })
+        }
+
         addView(spacer(8))
         addView(button(getString(R.string.main_add_apps)) { open(PickerActivity::class.java) })
 

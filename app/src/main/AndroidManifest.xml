@@ -55,6 +55,12 @@
             android:parentActivityName=".ui.MainActivity" />
 
         <activity
+            android:name=".ui.ProtectionActivity"
+            android:exported="false"
+            android:label="@string/protect_title"
+            android:parentActivityName=".ui.MainActivity" />
+
+        <activity
             android:name=".ui.LogActivity"
             android:exported="false"
             android:label="@string/log_title"

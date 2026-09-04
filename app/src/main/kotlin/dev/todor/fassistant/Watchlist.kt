@@ -100,6 +100,12 @@ class Watchlist private constructor(private val prefs: SharedPreferences) {
 
     fun setOemStepDone(id: String, done: Boolean) = prefs.edit().putBoolean("oem_$id", done).apply()
 
+    /** Manufacturer screens cannot be read back, so whether they were done is recorded by hand. */
+    fun protectionConfirmed(pkg: String): Boolean = prefs.getBoolean("protected_$pkg", false)
+
+    fun setProtectionConfirmed(pkg: String, done: Boolean) =
+        prefs.edit().putBoolean("protected_$pkg", done).apply()
+
     private fun update(pkg: String, o: Observation) {
         observations[pkg] = o
         writeObservations()

@@ -84,6 +84,26 @@
     <string name="oem_protected">Keep it running in the background</string>
     <string name="oem_app_details">App info</string>
 
+    <!-- Protecting the watched apps from the system -->
+    <string name="protect_title">Keep watched apps alive</string>
+    <string name="protect_heading">Keep this app alive</string>
+    <string name="protect_intro">These are the phone\'s own settings, applied to the apps you watch. They make the system less likely to kill an app in the first place, which works better than reopening it afterwards.</string>
+    <string name="protect_battery_heading">Battery limits</string>
+    <string name="protect_battery_why">With battery limits on, the system is free to stop this app when the screen is off. Removing them is the one setting that most affects whether it survives.</string>
+    <string name="protect_unrestricted">Unrestricted</string>
+    <string name="protect_restricted">Restricted</string>
+    <string name="protect_remove_limits">Remove battery limits</string>
+    <string name="protect_open_app_settings">Open this app\'s settings</string>
+    <string name="protect_open_battery_list">Open the full battery list</string>
+    <string name="protect_all_apps">Do this for every watched app</string>
+    <string name="protect_restricted_count">%1$d of %2$d watched apps can still be stopped to save battery.</string>
+    <string name="protect_all_clear">Every watched app is exempt from battery limits.</string>
+    <string name="protect_manufacturer_heading">Manufacturer settings</string>
+    <string name="protect_manufacturer_why">These screens list every app at once, and the phone gives no way to read back what you chose. Allow each watched app to start on its own and run without limits, then tick it off below.</string>
+    <string name="protect_confirmed_for">Done for %1$s</string>
+    <string name="protect_not_needed_heading">What is not here, and why</string>
+    <string name="protect_not_needed_why">Fassistant also holds permissions for drawing over other apps, usage access and notification access. Those decide what Fassistant may watch and start — they do nothing for whether a watched app survives, so granting them to one would be pointless.</string>
+
     <!-- Updates -->
     <string name="update_title">Updates</string>
     <string name="update_check_now">Check for an update</string>
