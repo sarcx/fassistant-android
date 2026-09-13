@@ -91,6 +91,14 @@ class Watchlist private constructor(private val prefs: SharedPreferences) {
         get() = prefs.getLong(KEY_HEARTBEAT, 0L)
         set(value) = prefs.edit().putLong(KEY_HEARTBEAT, value).apply()
 
+    /**
+     * When the boot broadcast last arrived. Compared against the time the phone actually started,
+     * this separates "we were never told the phone rebooted" from "we were told and failed".
+     */
+    var bootSeenAt: Long
+        get() = prefs.getLong(KEY_BOOT_SEEN, 0L)
+        set(value) = prefs.edit().putLong(KEY_BOOT_SEEN, value).apply()
+
     /** Stretches where the service was not ticking, newest first. */
     fun gaps(): List<LongRange> {
         val array = JSONArray(prefs.getString(KEY_GAPS, "[]") ?: "[]")
@@ -216,6 +224,7 @@ class Watchlist private constructor(private val prefs: SharedPreferences) {
         const val HEARTBEAT_WRITE_MS = 60_000L
         private const val MAX_GAPS = 10
         private const val KEY_HEARTBEAT = "heartbeat_at"
+        private const val KEY_BOOT_SEEN = "boot_seen_at"
         private const val KEY_GAPS = "gaps"
         private const val KEY_RETURN_TO_PREVIOUS = "return_to_previous"
         private const val KEY_UPDATE_URL = "update_url"

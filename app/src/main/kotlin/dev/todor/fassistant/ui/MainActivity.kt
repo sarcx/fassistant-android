@@ -3,6 +3,7 @@ package dev.todor.fassistant.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.Gravity
 import android.view.View
 import android.widget.CheckBox
@@ -46,8 +47,16 @@ class MainActivity : Activity() {
         val alarmAlive = TickAlarm.isScheduled(this@MainActivity)
         val jobAlive = TickJob.isScheduled(this@MainActivity)
         addView(caption(getString(R.string.main_revival, yesNo(alarmAlive), yesNo(jobAlive))))
-        if (!alarmAlive && !jobAlive && !WatchdogService.running) {
-            addView(spacer(6))
+
+        // A reboot always clears alarms, so their absence proves nothing on its own. The job is
+        // persisted across reboots, so a missing job is the meaningful signal.
+        val bootedAt = System.currentTimeMillis() - SystemClock.elapsedRealtime()
+        val heardAboutBoot = watchlist.bootSeenAt >= bootedAt
+
+        addView(spacer(6))
+        if (!heardAboutBoot) {
+            addView(body(getString(R.string.main_missed_boot, formatAgo(bootedAt))))
+        } else if (!jobAlive && !WatchdogService.running) {
             addView(body(getString(R.string.main_force_stopped)))
         }
 

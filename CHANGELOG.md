@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.7.0
+
+Says whether the phone told it about a reboot, which is the difference between "we were never
+asked to start" and "we were asked and failed".
+
+The boot broadcast is now recorded the instant it arrives, before anything can return early. The
+main screen compares that against the time the phone actually started, and if the broadcast never
+came it says so plainly along with what to do about it. Nearly always this is the manufacturer
+withholding permission to launch automatically.
+
+**Corrects a wrong diagnosis in 0.5.0.** It claimed a force-stop whenever both the restart alarm
+and the scheduled job were missing. A reboot always clears alarms, so after any restart that
+message could appear with no force-stop involved. Only the job survives a reboot, so only a missing
+job means anything, and the check now rests on that alone.
+
+The log also records when a boot broadcast is received but ignored because the watchdog is switched
+off — previously that returned silently and looked identical to never being told.
+
 ## 0.6.0
 
 Watches apps that have no icon, such as the plugin a remote-control app uses to drive the
