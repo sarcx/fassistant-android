@@ -144,29 +144,37 @@ class WatchdogService : Service() {
 
         val wasInFront = ladder.foreground.topPackage()
         var reopened: String? = null
+        var cameToFront: String? = null
         var wantsToStayInFront = false
 
         for (app in watchlist.all()) {
             proveOrWarn(app, now)
             val verdict = ladder.verdict(app, now)
-            val didReopen = when (verdict.liveness) {
+            val method = when (verdict.liveness) {
                 Liveness.ALIVE -> {
                     watchlist.markAlive(app.pkg, now)
                     Notifications.clearBlocked(this, app.pkg)
-                    false
+                    null
                 }
 
                 Liveness.DEAD -> relauncher.relaunch(app, now, verdict.source)
                 Liveness.UNKNOWN -> applyPolicy(app, now)
             }
-            if (didReopen) {
+            if (method != null) {
                 reopened = app.pkg
-                awaitingProof[app.pkg] = now
-                if (app.mode == Mode.KEEP_IN_FRONT) wantsToStayInFront = true
+                // Only a screen start takes over the display, and only a screen start can be
+                // silently dropped by the background-start restriction. A service or provider
+                // start is invisible by design, so there is nothing to put back and nothing to
+                // prove — expecting it to reach the foreground would flag every one as blocked.
+                if (method is StartMethod.Screen) {
+                    awaitingProof[app.pkg] = now
+                    cameToFront = app.pkg
+                    if (app.mode == Mode.KEEP_IN_FRONT) wantsToStayInFront = true
+                }
             }
         }
 
-        if (reopened != null && !wantsToStayInFront) restoreScreen(wasInFront, reopened)
+        if (cameToFront != null && !wantsToStayInFront) restoreScreen(wasInFront, cameToFront)
         showStatus(reopened)
         maybeCheckForUpdate(now)
     }
@@ -215,19 +223,19 @@ class WatchdogService : Service() {
         }
     }
 
-    private fun applyPolicy(app: WatchedApp, now: Long): Boolean = when (app.mode) {
-        Mode.ON_SIGNAL -> false
+    private fun applyPolicy(app: WatchedApp, now: Long): StartMethod? = when (app.mode) {
+        Mode.ON_SIGNAL -> null
 
         Mode.KEEP_IN_FRONT -> {
             val isTop = ladder.foreground.topPackage() == app.pkg
             val awayFor = now - ladder.foreground.lastResumedAt(app.pkg)
-            if (!isTop && awayFor > app.graceMs) relauncher.relaunch(app, now, "not in front") else false
+            if (!isTop && awayFor > app.graceMs) relauncher.relaunch(app, now, "not in front") else null
         }
 
         Mode.SWEEP -> {
             val observation = watchlist.observation(app.pkg)
             val quietSince = maxOf(observation.lastAliveAt, observation.lastRelaunchAt)
-            if (now - quietSince > app.sweepMs) relauncher.relaunch(app, now, "timer") else false
+            if (now - quietSince > app.sweepMs) relauncher.relaunch(app, now, "timer") else null
         }
     }
 

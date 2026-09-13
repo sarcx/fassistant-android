@@ -9,7 +9,9 @@ class Detectability(val badge: Badge, val whyRes: Int)
 object Detectabilities {
 
     fun of(ctx: Context, pkg: String, watchlist: Watchlist, processChecksWork: Boolean): Detectability {
-        if (ctx.packageManager.getLaunchIntentForPackage(pkg) == null) {
+        // Having no icon is not the same as being unstartable: a plugin with an exported service
+        // has no launcher activity but its process can still be started.
+        if (Starter.resolve(ctx, pkg) is StartMethod.None) {
             return Detectability(Badge.NO_LAUNCHER, R.string.badge_no_launcher_why)
         }
         if (processChecksWork) return Detectability(Badge.EXACT, R.string.badge_exact_why)

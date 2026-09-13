@@ -12,6 +12,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -37,6 +38,7 @@ class PickerActivity : Activity() {
     private var everything: List<AppEntry> = emptyList()
     private var shown: List<AppEntry> = emptyList()
     private var query = ""
+    private var showEverything = false
 
     private val adapter = object : BaseAdapter() {
         override fun getCount() = shown.size
@@ -77,9 +79,19 @@ class PickerActivity : Activity() {
             setOnItemClickListener { _, _, position, _ -> openDetail(shown[position].pkg) }
         }
 
+        val includeHidden = CheckBox(this).apply {
+            text = getString(R.string.picker_show_all)
+            isChecked = showEverything
+            setOnCheckedChangeListener { _, checked ->
+                showEverything = checked
+                loadApps()
+            }
+        }
+
         setContentView(
             verticalLayout().apply {
                 addView(search)
+                addView(includeHidden)
                 addView(status)
                 addView(listView)
             }
@@ -102,14 +114,24 @@ class PickerActivity : Activity() {
     private fun loadApps() {
         Executors.newSingleThreadExecutor().execute {
             val launcherIntent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-            val resolved = runCatching { packageManager.queryIntentActivities(launcherIntent, 0) }
+            val withIcons = runCatching { packageManager.queryIntentActivities(launcherIntent, 0) }
                 .getOrDefault(emptyList())
-            val entries = resolved
                 .mapNotNull { it.activityInfo?.applicationInfo }
+
+            // Plugins and helper apps often have no launcher activity, so they never appear in the
+            // list above even though their process is exactly the kind worth watching.
+            val rest = if (!showEverything) {
+                emptyList()
+            } else {
+                runCatching { packageManager.getInstalledApplications(0) }.getOrDefault(emptyList())
+            }
+
+            val entries = (withIcons + rest)
                 .distinctBy { it.packageName }
                 .filter { it.packageName != packageName }
                 .map { AppEntry(it.packageName, packageManager.getApplicationLabel(it).toString()) }
                 .sortedWith(compareByDescending<AppEntry> { watchlist.isWatched(it.pkg) }.thenBy { it.label.lowercase() })
+
             Handler(Looper.getMainLooper()).post {
                 everything = entries
                 applyFilter()

@@ -1,7 +1,6 @@
 package dev.todor.fassistant
 
 import android.content.Context
-import android.content.Intent
 
 class Relauncher(
     private val ctx: Context,
@@ -11,36 +10,32 @@ class Relauncher(
 
     private val recentLaunches = ArrayDeque<Long>()
 
-    fun relaunch(app: WatchedApp, now: Long, reason: String): Boolean {
+    /** Returns how the app was started, or null if it was not. */
+    fun relaunch(app: WatchedApp, now: Long, reason: String): StartMethod? {
         val observation = watchlist.observation(app.pkg)
         val wait = backoffMs(observation.relaunchCount)
-        if (observation.lastRelaunchAt > 0 && now - observation.lastRelaunchAt < wait) return false
+        if (observation.lastRelaunchAt > 0 && now - observation.lastRelaunchAt < wait) return null
 
         if (!withinRateCap(now)) {
             log.line("skipped ${app.pkg}: rate cap reached")
-            return false
+            return null
         }
 
-        val intent = ctx.packageManager.getLaunchIntentForPackage(app.pkg)
-        if (intent == null) {
-            log.line("skipped ${app.pkg}: no launchable screen")
-            return false
+        val method = Starter.resolve(ctx, app.pkg)
+        if (method is StartMethod.None) {
+            log.line("skipped ${app.pkg}: nothing in it can be started")
+            return null
         }
-        // No CLEAR_TASK on purpose — if the app is somehow alive, resume it rather than restart it.
-        // No animation, because the app is usually sent straight back again and the transition
-        // would be the most visible part of an operation meant to go unnoticed.
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION)
 
-        return try {
-            ctx.startActivity(intent)
-            recentLaunches.addLast(now)
-            watchlist.markRelaunch(app.pkg, now)
-            log.line("reopened ${app.pkg} ($reason)")
-            true
-        } catch (e: Exception) {
-            log.line("failed to reopen ${app.pkg}: ${e.javaClass.simpleName}")
-            false
+        if (!Starter.start(ctx, method)) {
+            log.line("failed to start ${app.pkg} (${method.javaClass.simpleName})")
+            return null
         }
+
+        recentLaunches.addLast(now)
+        watchlist.markRelaunch(app.pkg, now)
+        log.line("started ${app.pkg} via ${method.javaClass.simpleName} ($reason)")
+        return method
     }
 
     private fun withinRateCap(now: Long): Boolean {

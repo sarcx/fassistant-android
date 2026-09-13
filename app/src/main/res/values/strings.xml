@@ -61,8 +61,13 @@
     <string name="badge_strong_media">Seen playing media.</string>
     <string name="badge_weak">Weak</string>
     <string name="badge_weak_why">No signal seen yet, so this app can only be reopened on a timer. The badge improves by itself if a signal appears.</string>
-    <string name="badge_no_launcher">No launcher</string>
-    <string name="badge_no_launcher_why">This app has no screen to open, so it can never be reopened.</string>
+    <string name="badge_no_launcher">Cannot start</string>
+    <string name="badge_no_launcher_why">Nothing in this app can be started from outside it, so it can never be reopened.</string>
+    <string name="picker_show_all">Also show apps with no icon</string>
+    <string name="start_via_screen">Reopened by opening it on screen.</string>
+    <string name="start_via_service">Reopened by starting one of its background parts. Nothing appears on screen, which is how a plugin with no icon can still be kept alive.</string>
+    <string name="start_via_provider">Reopened by quietly reading from it, which is enough to start it running again.</string>
+    <string name="start_via_nothing">There is no way to start this app from outside it.</string>
 
     <!-- App detail -->
     <string name="detail_mode_heading">When to reopen it</string>

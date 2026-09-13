@@ -57,8 +57,9 @@ object Notifications {
      * even when the silent relaunch does not.
      */
     fun postBlocked(ctx: Context, pkg: String, label: CharSequence) {
-        val launch = ctx.packageManager.getLaunchIntentForPackage(pkg) ?: return
-        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        // Only meaningful for an app that is opened on screen: those are the starts Android can
+        // silently drop, and the only ones a tap can stand in for.
+        val launch = (Starter.resolve(ctx, pkg) as? StartMethod.Screen)?.intent ?: return
         val tap = PendingIntent.getActivity(
             ctx,
             idFor(pkg),

@@ -16,6 +16,7 @@ import dev.todor.fassistant.Detectabilities
 import dev.todor.fassistant.Mode
 import dev.todor.fassistant.Protection
 import dev.todor.fassistant.R
+import dev.todor.fassistant.Starter
 import dev.todor.fassistant.WatchdogService
 import dev.todor.fassistant.WatchedApp
 import dev.todor.fassistant.Watchlist
@@ -70,6 +71,8 @@ class AppDetailActivity : Activity() {
         )
         addView(spacer(6))
         addView(caption(getString(detectability.whyRes)))
+        addView(spacer(4))
+        addView(caption(getString(Starter.descriptionRes(Starter.resolve(this@AppDetailActivity, pkg)))))
 
         if (detectability.badge == Badge.NO_LAUNCHER) return@apply
 

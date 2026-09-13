@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.6.0
+
+Watches apps that have no icon, such as the plugin a remote-control app uses to drive the
+touchscreen. Two things stopped that working, and both are fixed.
+
+The picker only ever listed apps with a launcher icon, so a plugin never appeared at all. There is
+now an **Also show apps with no icon** switch, off by default so the usual list stays short.
+
+Reopening also assumed every app had a screen to open. It now tries, in order: the app's icon, a
+leanback icon, any exported activity, any exported background service, and finally reading from an
+exported content provider. Starting any part of a package starts its process, which is the point.
+
+Starting a background part is **invisible** — nothing appears on screen and nothing has to be put
+back afterwards. For an app with no icon that is the normal route, and a better one than opening a
+screen.
+
+The detail screen now says which of those routes a given app would use, and the **Cannot start**
+badge now means exactly that rather than merely "has no icon".
+
 ## 0.5.0
 
 Makes downtime visible. After a week of running, the app stopped and could say nothing about it —
