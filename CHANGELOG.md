@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.1
+
+Nothing in the app itself changed. The published release manifest now carries two more fields: the
+package this repository installs, and the name to show for it.
+
+They are there for the new catalogue app, which reads the manifest of every Fassistant app to build
+its list. Without the package name it can offer to install this app but cannot look it up on the
+phone, so a row could never say "you have 0.7.0 and 0.7.1 is out" — only "here is an app".
+
 ## 0.7.0
 
 Says whether the phone told it about a reboot, which is the difference between "we were never
