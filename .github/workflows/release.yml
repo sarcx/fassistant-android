@@ -123,14 +123,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           KEEP: ${{ steps.version.outputs.tag }}
         run: |
-          # The tags stay: only the published releases and their assets are removed, so nothing
-          # in the history is lost. Add --cleanup-tag below to drop the tags as well.
+          # Tags go with their releases. Which commit each version came from is recorded in
+          # RELEASES.md instead, so deleting the tag loses nothing.
           gh release list --limit 100 --json tagName --jq '.[].tagName' > all-tags.txt
           while read -r old; do
             [ -n "$old" ] || continue
             [ "$old" = "$KEEP" ] && continue
-            echo "deleting release $old"
-            gh release delete "$old" --yes
+            echo "deleting release $old and its tag"
+            gh release delete "$old" --cleanup-tag --yes
           done < all-tags.txt
 
       - name: Summary

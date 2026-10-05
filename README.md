@@ -167,8 +167,9 @@ git push origin v0.2.0
 ```
 
 `.github/workflows/release.yml` then builds, signs, publishes `fassistant.apk` and `update.json` as
-release assets, and **deletes every older release** so only the newest is ever published. Tags are
-left alone, so history stays intact. The workflow refuses to run if the tag and `VERSION_NAME`
+release assets, and **deletes every older release, along with its tag**, so only the newest is ever
+published. `RELEASES.md` records which commit each version was built from, so nothing is lost when
+a tag goes — add a row when you cut one. The workflow refuses to run if the tag and `VERSION_NAME`
 disagree, or if that version is already released.
 
 ## Versions
