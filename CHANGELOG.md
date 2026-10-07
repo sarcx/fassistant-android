@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.3
+
+Fixes self-update failing on Xiaomi phones with "INSTALL_FAILED_INTERNAL_ERROR: Permission Denied".
+
+Xiaomi's Android, with its default "MIUI optimization" on, refuses the install route the update
+used, a PackageInstaller session, to ordinary apps. The only cure on the phone is a developer
+setting. The update now opens Android's own install screen on the download instead, which Xiaomi
+allows and every other phone handles the same way. The checksum and signing key are still checked
+first.
+
 ## 0.7.2
 
 Removes a warning that was always wrong on Android 8 and later. The permissions list showed "Install
