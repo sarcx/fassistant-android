@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.PowerManager
 import android.os.Process
 import android.provider.Settings
@@ -47,18 +46,13 @@ object Grants {
         return power.isIgnoringBatteryOptimizations(ctx.packageName)
     }
 
-    /** Needed to install our own updates. Always true below Android 8, which had no per-app switch. */
-    fun canInstallPackages(ctx: Context): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return true
-        return ctx.packageManager.canRequestPackageInstalls()
-    }
-
-    fun unknownSourcesIntent(ctx: Context): Intent? {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return null
-        return Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${ctx.packageName}"))
-    }
-
-    fun all(ctx: Context): List<GrantState> = listOfNotNull(
+    /**
+     * Permission to install apps is deliberately not in this list. On Android 8 and later,
+     * canRequestPackageInstalls() answers false for any app targeting below 26 — this one targets
+     * 25 — however the setting is set, so the row could only ever say "not granted". Android's own
+     * install confirmation checks the real setting and links to it when it is off.
+     */
+    fun all(ctx: Context): List<GrantState> = listOf(
         GrantState(
             R.string.grant_overlay,
             R.string.grant_overlay_why,
@@ -83,8 +77,5 @@ object Grants {
             ignoringBatteryOptimizations(ctx),
             Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${ctx.packageName}")),
         ),
-        unknownSourcesIntent(ctx)?.let {
-            GrantState(R.string.grant_install, R.string.grant_install_why, canInstallPackages(ctx), it)
-        },
     )
 }

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.2
+
+Removes a warning that was always wrong on Android 8 and later. The permissions list showed "Install
+unknown apps" as missing, and the update screen said Android would refuse to install, even after
+the permission had been allowed.
+
+The app asked Android whether it was allowed to install apps. For an app that targets Android 7.1 or
+older, as this one deliberately does, Android answers no to that question whatever the setting says.
+Installing an update never depended on that answer, so updates still worked; only the warning was
+false. It is gone, and Android's own installer checks the real setting: if it is off, it says so,
+links to it and then carries on with the install.
+
 ## 0.7.1
 
 Nothing in the app itself changed. The published release manifest now carries two more fields: the

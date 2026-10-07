@@ -10,7 +10,6 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import dev.todor.fassistant.BuildConfig
 import dev.todor.fassistant.DeathLog
-import dev.todor.fassistant.Grants
 import dev.todor.fassistant.R
 import dev.todor.fassistant.Watchlist
 import dev.todor.fassistant.update.CheckResult
@@ -86,12 +85,6 @@ class UpdateActivity : Activity() {
                     UpdateInstaller.install(this@UpdateActivity, available)
                 }
             )
-            if (!Grants.canInstallPackages(this@UpdateActivity)) {
-                addView(caption(getString(R.string.update_needs_unknown_sources)))
-                Grants.unknownSourcesIntent(this@UpdateActivity)?.let { intent ->
-                    addView(button(getString(R.string.grant_fix)) { runCatching { startActivity(intent) } })
-                }
-            }
         }
 
         addView(spacer(14))

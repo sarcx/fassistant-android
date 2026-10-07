@@ -40,8 +40,6 @@
     <string name="grant_notifications_why">Our strongest signal that an app has died.</string>
     <string name="grant_battery">Unrestricted battery</string>
     <string name="grant_battery_why">Stops Android delaying our checks while the screen is off.</string>
-    <string name="grant_install">Install unknown apps</string>
-    <string name="grant_install_why">Lets Fassistant install its own updates.</string>
     <string name="grant_granted">Granted</string>
     <string name="grant_missing">Missing</string>
     <string name="grant_fix">Fix</string>
@@ -134,7 +132,6 @@
     <string name="update_url_why">Point this at a different address to install from somewhere else, such as a machine on your own network.</string>
     <string name="update_save_url">Save address</string>
     <string name="update_url_saved">Address saved.</string>
-    <string name="update_needs_unknown_sources">Android will refuse until Fassistant is allowed to install apps.</string>
     <string name="update_install_failed">Could not start the install.</string>
     <string name="update_notification_title">Fassistant %1$s is ready</string>
     <string name="update_notification_text">Tap to install it.</string>
