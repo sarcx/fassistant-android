@@ -131,29 +131,38 @@ class MainActivity : Activity() {
         addView(button(getString(R.string.main_view_log)) { open(LogActivity::class.java) })
     }
 
-    private fun grantRow(grant: GrantState): View = horizontalLayout().apply {
-        val text = verticalLayout(padding = 0).apply {
-            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-            addView(body(getString(grant.titleRes)))
-            addView(caption(getString(grant.whyRes)))
-        }
-        addView(text)
-        if (grant.granted) {
-            addView(badge(getString(R.string.grant_granted), badgeColor(Badge.STRONG)))
-        } else {
-            addView(badge(getString(R.string.grant_missing), badgeColor(Badge.NO_LAUNCHER)))
-            grant.intent?.let { intent ->
+    private fun grantRow(grant: GrantState): View = verticalLayout(padding = 0).apply {
+        addView(
+            horizontalLayout().apply {
                 addView(
-                    button(getString(R.string.grant_fix)) { startSafely(intent) }.apply {
-                        layoutParams = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                        )
+                    verticalLayout(padding = 0).apply {
+                        layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                        addView(body(getString(grant.titleRes)))
+                        addView(caption(getString(grant.whyRes)))
                     }
                 )
+                if (grant.granted) {
+                    addView(badge(getString(R.string.grant_granted), badgeColor(Badge.STRONG)))
+                } else {
+                    addView(badge(getString(R.string.grant_missing), badgeColor(Badge.NO_LAUNCHER)))
+                    grant.intent?.let { addView(compactButton(getString(R.string.grant_fix)) { startSafely(it) }) }
+                }
+            }
+        )
+        if (!grant.granted) {
+            grant.unlock?.let { unlock ->
+                addView(caption(getString(R.string.grant_restricted_steps)))
+                addView(compactButton(getString(R.string.grant_open_app_info)) { startSafely(unlock) })
             }
         }
         setPadding(0, dp(6), 0, dp(6))
+    }
+
+    private fun compactButton(text: String, onClick: () -> Unit) = button(text, onClick).apply {
+        layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+        )
     }
 
     private fun watchedRow(pkg: String): View = horizontalLayout().apply {

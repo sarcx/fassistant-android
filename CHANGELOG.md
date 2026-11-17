@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.7.4
+
+Helps with notification access on Android 13 and later, where the switch can refuse to turn on with
+a "Restricted setting" message.
+
+Android blocks notification access for apps installed outside an app store until "Allow restricted
+settings" is chosen in the ⋮ menu of the app's App info screen. That menu item only appears after
+the refusal has been shown once, which is why it is so hard to find. On those phones the
+permissions list now spells out the steps under the notification access row, with an **Open app
+info** button that goes straight to the right screen.
+
+**Fix** for notification access also lands more precisely. From Android 11 it opens the switch for
+Fassistant alone instead of the list of every app that can read notifications.
+
 ## 0.7.3
 
 Fixes self-update failing on Xiaomi phones with "INSTALL_FAILED_INTERNAL_ERROR: Permission Denied".

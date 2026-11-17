@@ -1,19 +1,28 @@
 package dev.todor.fassistant
 
 import android.app.AppOpsManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.PowerManager
 import android.os.Process
 import android.provider.Settings
+import dev.todor.fassistant.liveness.NotificationWatcher
 
 class GrantState(
     val titleRes: Int,
     val whyRes: Int,
     val granted: Boolean,
     val intent: Intent?,
+    /**
+     * Where to go when Android refuses the setting as "restricted". From Android 13, a sideloaded
+     * app cannot be given notification access until "Allow restricted settings" is chosen in the
+     * ⋮ menu of its App info screen — a menu item that only appears after one refusal.
+     */
+    val unlock: Intent? = null,
 )
 
 object Grants {
@@ -63,7 +72,9 @@ object Grants {
             R.string.grant_notifications,
             R.string.grant_notifications_why,
             hasNotificationAccess(ctx),
-            Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS),
+            notificationAccessIntent(ctx),
+            unlock = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${ctx.packageName}"))
+                .takeIf { Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU },
         ),
         GrantState(
             R.string.grant_usage,
@@ -78,4 +89,18 @@ object Grants {
             Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${ctx.packageName}")),
         ),
     )
+
+    /**
+     * From Android 11 this opens the switch for Fassistant alone, rather than a list of every app
+     * that can read notifications. Older phones, and any that drop the screen, get the list.
+     */
+    private fun notificationAccessIntent(ctx: Context): Intent {
+        val list = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return list
+        val direct = Intent(Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS).putExtra(
+            Settings.EXTRA_NOTIFICATION_LISTENER_COMPONENT_NAME,
+            ComponentName(ctx, NotificationWatcher::class.java).flattenToString(),
+        )
+        return if (ctx.packageManager.resolveActivity(direct, 0) != null) direct else list
+    }
 }

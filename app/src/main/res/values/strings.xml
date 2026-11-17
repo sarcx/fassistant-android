@@ -43,6 +43,8 @@
     <string name="grant_granted">Granted</string>
     <string name="grant_missing">Missing</string>
     <string name="grant_fix">Fix</string>
+    <string name="grant_restricted_steps">If Android says \"Restricted setting\": tap Fix and close that message. Then tap Open app info, open the ⋮ menu at the top right, and choose Allow restricted settings. Come back and tap Fix again. The menu item only appears after the message has been shown once.</string>
+    <string name="grant_open_app_info">Open app info</string>
 
     <!-- Picker -->
     <string name="picker_title">Add apps</string>

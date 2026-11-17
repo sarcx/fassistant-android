@@ -7,6 +7,8 @@ Written by hand when a release is cut. `git show <commit>` still works for every
 
 | Version | Code | Commit | Released |
 | --- | --- | --- | --- |
+| 0.7.3 | 11 | `a899b1c` | 2026-10-07 |
+| 0.7.2 | 10 | `5a0d0dc` | 2026-10-07 |
 | 0.7.1 | 9 | `05d5dbb` | 2026-09-23 |
 | 0.7.0 | 8 | `25d9bb6` | 2026-09-14 |
 | 0.6.0 | 7 | `ed89441` | 2026-09-14 |
